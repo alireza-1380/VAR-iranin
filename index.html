@@ -1,0 +1,1496 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سیستم VAR - تشخیص آفساید با رسم آزاد</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: #0a1929;
+            color: #fff;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background: linear-gradient(90deg, #001e3c, #0a1929);
+            padding: 15px 30px;
+            border-bottom: 2px solid #00b4d8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo i {
+            font-size: 2rem;
+            color: #00b4d8;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            color: #00b4d8;
+        }
+        
+        .subtitle {
+            font-size: 0.9rem;
+            color: #90e0ef;
+        }
+        
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        .left-panel {
+            width: 320px;
+            background: #001e3c;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            border-left: 2px solid #013a63;
+            flex-shrink: 0;
+            overflow-y: auto;
+        }
+        
+        .upload-section {
+            background: rgba(0, 25, 54, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid #013a63;
+        }
+        
+        .section-title {
+            color: #90e0ef;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title i {
+            color: #00b4d8;
+        }
+        
+        .upload-methods {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .upload-box {
+            border: 2px dashed #00b4d8;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(0, 180, 216, 0.05);
+        }
+        
+        .upload-box:hover {
+            background: rgba(0, 180, 216, 0.1);
+            border-color: #90e0ef;
+        }
+        
+        .upload-box i {
+            font-size: 2.5rem;
+            color: #00b4d8;
+            margin-bottom: 10px;
+        }
+        
+        .upload-input {
+            display: none;
+        }
+        
+        .url-input-container {
+            margin-top: 10px;
+        }
+        
+        .url-input {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 6px;
+            border: 1px solid #013a63;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+        
+        .url-input:focus {
+            outline: none;
+            border-color: #00b4d8;
+        }
+        
+        .video-info {
+            background: rgba(0, 54, 116, 0.3);
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .video-preview {
+            aspect-ratio: 16/9;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .video-preview video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            flex: 1;
+        }
+        
+        .btn-primary {
+            background: #00b4d8;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #0096c7;
+        }
+        
+        .btn-secondary {
+            background: #5a6268;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #4a5258;
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+        }
+        
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+        
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            overflow: hidden;
+        }
+        
+        .video-display {
+            flex: 1;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            border: 2px solid #013a63;
+            margin-bottom: 15px;
+        }
+        
+        #videoPlayer {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            cursor: default;
+        }
+        
+        #drawingCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: auto;
+            cursor: crosshair;
+        }
+        
+        .video-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #90e0ef;
+        }
+        
+        .video-placeholder i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: #013a63;
+        }
+        
+        .controls-panel {
+            background: #001e3c;
+            border-radius: 10px;
+            padding: 15px 20px;
+            border: 1px solid #013a63;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            border: 1px solid #013a63;
+        }
+        
+        .control-group label {
+            color: #90e0ef;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+        
+        .control-btn {
+            padding: 8px 16px;
+            border: 1px solid #013a63;
+            background: rgba(0, 180, 216, 0.1);
+            color: #90e0ef;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .control-btn:hover {
+            background: rgba(0, 180, 216, 0.2);
+            border-color: #00b4d8;
+        }
+        
+        .control-btn.active {
+            background: #00b4d8;
+            color: white;
+            border-color: #00b4d8;
+        }
+        
+        .slider {
+            width: 100px;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #00b4d8;
+            cursor: pointer;
+        }
+        
+        .zoom-controls {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+        
+        .zoom-btn {
+            width: 35px;
+            height: 35px;
+            border: 1px solid #013a63;
+            background: rgba(255, 255, 255, 0.05);
+            color: #90e0ef;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .zoom-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .zoom-value {
+            min-width: 40px;
+            text-align: center;
+            color: #00b4d8;
+            font-weight: bold;
+        }
+        
+        .drawing-tools {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+        
+        .tool-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            border: 1px solid #013a63;
+            background: rgba(255, 255, 255, 0.05);
+            color: #90e0ef;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+        }
+        
+        .tool-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .tool-btn.active {
+            background: #00b4d8;
+            color: white;
+            border-color: #00b4d8;
+        }
+        
+        .color-picker {
+            width: 35px;
+            height: 35px;
+            border: 2px solid #013a63;
+            border-radius: 50%;
+            cursor: pointer;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        .color-picker::-webkit-color-swatch {
+            border: none;
+            border-radius: 50%;
+        }
+        
+        .color-picker::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+        
+        .status-bar {
+            background: #001e3c;
+            padding: 10px 20px;
+            border-top: 1px solid #013a63;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: #90e0ef;
+            flex-shrink: 0;
+        }
+        
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .status-value {
+            color: #00b4d8;
+            font-weight: bold;
+        }
+        
+        .mode-indicator {
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+        
+        .mode-drawing {
+            background: rgba(0, 180, 216, 0.2);
+            color: #00b4d8;
+        }
+        
+        .mode-pen {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+        }
+        
+        .overlay-tools {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 10;
+        }
+        
+        .overlay-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #00b4d8;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+        }
+        
+        .overlay-btn:hover {
+            background: rgba(0, 180, 216, 0.3);
+            transform: scale(1.1);
+        }
+        
+        .overlay-btn.active {
+            background: #00b4d8;
+        }
+        
+        .instructions {
+            background: rgba(0, 25, 54, 0.8);
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: #90e0ef;
+            line-height: 1.5;
+            border: 1px solid #013a63;
+        }
+        
+        .instructions ul {
+            padding-right: 20px;
+            margin-top: 10px;
+        }
+        
+        .instructions li {
+            margin-bottom: 5px;
+        }
+        
+        .small-text {
+            font-size: 0.8rem;
+            color: #6c8ba5;
+            text-align: center;
+            margin-top: 10px;
+        }
+        
+        .drawing-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid #00b4d8;
+            z-index: 10;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: #001e3c;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            border: 2px solid #00b4d8;
+        }
+        
+        .modal h3 {
+            color: #00b4d8;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        @media (max-width: 1200px) {
+            .left-panel {
+                width: 280px;
+            }
+            
+            .controls-panel {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+            <i class="fas fa-futbol"></i>
+            <div>
+                <h1>سیستم VAR - رسم آزاد روی ویدیو</h1>
+                <p class="subtitle">توقف ویدیو و رسم مانند مداد + ابزارهای حرفه‌ای</p>
+            </div>
+        </div>
+        <div class="status-item">
+            <span>حالت فعلی:</span>
+            <span class="mode-indicator mode-drawing" id="modeIndicator">ویدیو</span>
+        </div>
+    </div>
+    
+    <div class="main-container">
+        <div class="left-panel">
+            <div class="upload-section">
+                <h3 class="section-title"><i class="fas fa-upload"></i> بارگذاری ویدیو</h3>
+                
+                <div class="upload-methods">
+                    <div class="upload-box" id="fileUploadBox">
+                        <i class="fas fa-file-video"></i>
+                        <p>آپلود فایل ویدیویی</p>
+                        <p class="small-text">MP4, AVI, MOV, MKV</p>
+                        <input type="file" id="fileInput" class="upload-input" accept="video/*">
+                    </div>
+                    
+                    <div class="upload-box" id="urlUploadBox">
+                        <i class="fas fa-link"></i>
+                        <p>لینک مستقیم ویدیو</p>
+                        <p class="small-text">آپارات، یوتیوب و ...</p>
+                    </div>
+                </div>
+                
+                <div class="url-input-container" id="urlInputContainer" style="display: none;">
+                    <input type="url" id="videoUrl" class="url-input" 
+                           placeholder="https://cdn.aparat.com/video/.../video.mp4">
+                    <div class="action-buttons">
+                        <button id="loadUrlBtn" class="btn btn-primary">
+                            <i class="fas fa-play"></i> بارگذاری
+                        </button>
+                        <button id="cancelUrlBtn" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> لغو
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="video-info" id="videoInfo">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong id="fileName"></strong>
+                            <div id="fileDetails" style="font-size: 0.8rem; color: #90e0ef;"></div>
+                        </div>
+                        <button id="clearVideoBtn" class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.8rem;">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="video-preview" id="videoPreview">
+                    <video id="previewPlayer"></video>
+                </div>
+                
+                <div class="action-buttons">
+                    <button id="togglePlayBtn" class="btn btn-warning" disabled>
+                        <i class="fas fa-play"></i> پخش/توقف
+                    </button>
+                    <button id="resetBtn" class="btn btn-secondary">
+                        <i class="fas fa-redo"></i> پاک کردن
+                    </button>
+                </div>
+            </div>
+            
+            <div class="instructions">
+                <h3 class="section-title"><i class="fas fa-info-circle"></i> راهنمای رسم آزاد</h3>
+                <ul>
+                    <li>ویدیو را آپلود یا لینک مستقیم وارد کنید</li>
+                    <li>روی دکمه "پخش/توقف" کلیک کنید تا ویدیو متوقف شود</li>
+                    <li>در حالت توقف، با ابزار مداد روی ویدیو رسم کنید</li>
+                    <li>از ابزارهای مختلف برای خط‌کشی استفاده کنید</li>
+                    <li>رنگ و ضخامت خط را تغییر دهید</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="video-display" id="videoDisplay">
+                <div class="overlay-tools">
+                    <button class="overlay-btn active" id="videoModeBtn" title="حالت عادی ویدیو">
+                        <i class="fas fa-video"></i>
+                    </button>
+                    <button class="overlay-btn" id="drawModeBtn" title="حالت رسم آزاد">
+                        <i class="fas fa-pencil-alt"></i>
+                    </button>
+                    <button class="overlay-btn" id="lineModeBtn" title="حالت رسم خط مستقیم">
+                        <i class="fas fa-ruler"></i>
+                    </button>
+                </div>
+                
+                <div class="drawing-controls" id="drawingControls" style="display: none;">
+                    <input type="color" id="colorPicker" class="color-picker" value="#ff0000" title="انتخاب رنگ">
+                    <input type="range" id="brushSize" min="1" max="20" value="3" title="ضخامت قلم">
+                    <button class="tool-btn" id="undoBtn" title="بازگشت">
+                        <i class="fas fa-undo"></i>
+                    </button>
+                    <button class="tool-btn" id="clearDrawBtn" title="پاک کردن همه">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    <button class="tool-btn" id="saveDrawBtn" title="ذخیره رسم">
+                        <i class="fas fa-save"></i>
+                    </button>
+                </div>
+                
+                <div class="video-placeholder" id="videoPlaceholder">
+                    <i class="fas fa-futbol"></i>
+                    <p>هنوز ویدیویی بارگذاری نشده است</p>
+                    <p>لطفاً ویدیوی فوتبال را از پنل سمت راست آپلود کنید</p>
+                </div>
+                
+                <video id="videoPlayer" controls></video>
+                <canvas id="drawingCanvas"></canvas>
+            </div>
+            
+            <div class="controls-panel">
+                <div class="control-group">
+                    <label>سرعت پخش:</label>
+                    <select id="speedSelect" class="control-btn">
+                        <option value="0.25">0.25x</option>
+                        <option value="0.5">0.5x</option>
+                        <option value="0.75">0.75x</option>
+                        <option value="1" selected>1x</option>
+                        <option value="1.25">1.25x</option>
+                        <option value="1.5">1.5x</option>
+                        <option value="2">2x</option>
+                    </select>
+                </div>
+                
+                <div class="control-group">
+                    <label>زوم:</label>
+                    <div class="zoom-controls">
+                        <button class="zoom-btn" id="zoomOutBtn">-</button>
+                        <span class="zoom-value" id="zoomValue">100%</span>
+                        <button class="zoom-btn" id="zoomInBtn">+</button>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <label>ابزارها:</label>
+                    <div class="drawing-tools">
+                        <button class="tool-btn active" id="penTool" title="قلم">
+                            <i class="fas fa-pen"></i>
+                        </button>
+                        <button class="tool-btn" id="lineTool" title="خط کش">
+                            <i class="fas fa-ruler"></i>
+                        </button>
+                        <button class="tool-btn" id="circleTool" title="دایره">
+                            <i class="fas fa-circle"></i>
+                        </button>
+                        <button class="tool-btn" id="textTool" title="متن">
+                            <i class="fas fa-font"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <button class="control-btn" id="gridToggleBtn" title="نمایش/مخفی کردن شبکه">
+                    <i class="fas fa-th"></i> شبکه
+                </button>
+                
+                <button class="control-btn" id="screenshotBtn" title="ذخیره عکس">
+                    <i class="fas fa-camera"></i> عکس
+                </button>
+                
+                <button class="control-btn" id="exportBtn" title="خروجی گرفتن">
+                    <i class="fas fa-download"></i> خروجی
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="status-bar">
+        <div class="status-item">
+            <span>حالت:</span>
+            <span class="status-value" id="currentMode">ویدیو</span>
+        </div>
+        <div class="status-item">
+            <span>ابزار:</span>
+            <span class="status-value" id="currentTool">--</span>
+        </div>
+        <div class="status-item">
+            <span>موقعیت:</span>
+            <span class="status-value" id="cursorPosition">--</span>
+        </div>
+        <div class="status-item">
+            <span>اندازه قلم:</span>
+            <span class="status-value" id="brushSizeValue">3px</span>
+        </div>
+    </div>
+    
+    <div class="modal" id="helpModal">
+        <div class="modal-content">
+            <h3>🎯 راهنمای رسم روی ویدیو</h3>
+            <div class="instructions">
+                <p><strong>1. توقف ویدیو:</strong> روی دکمه توقف کلیک کنید یا Space بزنید</p>
+                <p><strong>2. انتخاب ابزار:</strong> از دکمه‌های بالای ویدیو حالت رسم را انتخاب کنید</p>
+                <p><strong>3. رسم آزاد:</strong> در حالت توقف، با ماوس روی ویدیو بکشید</p>
+                <p><strong>4. ابزارها:</strong> قلم، خط‌کش، دایره و متن</p>
+                <p><strong>5. تنظیمات:</strong> رنگ و ضخامت خط را از پایین ویدیو تغییر دهید</p>
+                <p><strong>6. ذخیره:</strong> نتیجه را به عنوان عکس ذخیره کنید</p>
+            </div>
+            <div class="action-buttons" style="margin-top: 20px;">
+                <button id="closeHelpBtn" class="btn btn-primary">متوجه شدم</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // عناصر DOM
+        const fileInput = document.getElementById('fileInput');
+        const fileUploadBox = document.getElementById('fileUploadBox');
+        const urlUploadBox = document.getElementById('urlUploadBox');
+        const urlInputContainer = document.getElementById('urlInputContainer');
+        const videoUrl = document.getElementById('videoUrl');
+        const loadUrlBtn = document.getElementById('loadUrlBtn');
+        const cancelUrlBtn = document.getElementById('cancelUrlBtn');
+        const videoPlayer = document.getElementById('videoPlayer');
+        const drawingCanvas = document.getElementById('drawingCanvas');
+        const videoPlaceholder = document.getElementById('videoPlaceholder');
+        const previewPlayer = document.getElementById('previewPlayer');
+        const videoPreview = document.getElementById('videoPreview');
+        const videoInfo = document.getElementById('videoInfo');
+        const fileName = document.getElementById('fileName');
+        const fileDetails = document.getElementById('fileDetails');
+        const clearVideoBtn = document.getElementById('clearVideoBtn');
+        const togglePlayBtn = document.getElementById('togglePlayBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const videoModeBtn = document.getElementById('videoModeBtn');
+        const drawModeBtn = document.getElementById('drawModeBtn');
+        const lineModeBtn = document.getElementById('lineModeBtn');
+        const colorPicker = document.getElementById('colorPicker');
+        const brushSize = document.getElementById('brushSize');
+        const undoBtn = document.getElementById('undoBtn');
+        const clearDrawBtn = document.getElementById('clearDrawBtn');
+        const saveDrawBtn = document.getElementById('saveDrawBtn');
+        const drawingControls = document.getElementById('drawingControls');
+        const speedSelect = document.getElementById('speedSelect');
+        const zoomInBtn = document.getElementById('zoomInBtn');
+        const zoomOutBtn = document.getElementById('zoomOutBtn');
+        const zoomValue = document.getElementById('zoomValue');
+        const penTool = document.getElementById('penTool');
+        const lineTool = document.getElementById('lineTool');
+        const circleTool = document.getElementById('circleTool');
+        const textTool = document.getElementById('textTool');
+        const gridToggleBtn = document.getElementById('gridToggleBtn');
+        const screenshotBtn = document.getElementById('screenshotBtn');
+        const exportBtn = document.getElementById('exportBtn');
+        const modeIndicator = document.getElementById('modeIndicator');
+        const currentMode = document.getElementById('currentMode');
+        const currentTool = document.getElementById('currentTool');
+        const cursorPosition = document.getElementById('cursorPosition');
+        const brushSizeValue = document.getElementById('brushSizeValue');
+        const helpModal = document.getElementById('helpModal');
+        const closeHelpBtn = document.getElementById('closeHelpBtn');
+
+        // متغیرهای برنامه
+        let ctx = null;
+        let isDrawingMode = false;
+        let isVideoPaused = false;
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
+        let zoomLevel = 1;
+        let currentDrawingTool = 'pen';
+        let drawingHistory = [];
+        let currentPath = [];
+        let isGridVisible = false;
+        let videoLoaded = false;
+        let currentColor = '#ff0000';
+
+        // تنظیم کانواس
+        function setupCanvas() {
+            drawingCanvas.width = videoPlayer.offsetWidth;
+            drawingCanvas.height = videoPlayer.offsetHeight;
+            ctx = drawingCanvas.getContext('2d');
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            clearDrawingCanvas();
+        }
+
+        // پاک کردن کانواس
+        function clearDrawingCanvas() {
+            ctx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+            saveToHistory();
+        }
+
+        // ذخیره در تاریخچه
+        function saveToHistory() {
+            const imageData = ctx.getImageData(0, 0, drawingCanvas.width, drawingCanvas.height);
+            drawingHistory.push(imageData);
+            if (drawingHistory.length > 20) {
+                drawingHistory.shift();
+            }
+        }
+
+        // بازگشت به مرحله قبل
+        function undo() {
+            if (drawingHistory.length > 1) {
+                drawingHistory.pop();
+                const prevState = drawingHistory[drawingHistory.length - 1];
+                ctx.putImageData(prevState, 0, 0);
+            } else {
+                clearDrawingCanvas();
+            }
+        }
+
+        // رویدادهای آپلود فایل
+        fileUploadBox.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', handleFileSelect);
+
+        urlUploadBox.addEventListener('click', () => {
+            urlInputContainer.style.display = 'block';
+            urlUploadBox.style.display = 'none';
+            fileUploadBox.style.display = 'none';
+        });
+
+        cancelUrlBtn.addEventListener('click', () => {
+            urlInputContainer.style.display = 'none';
+            urlUploadBox.style.display = 'block';
+            fileUploadBox.style.display = 'block';
+            videoUrl.value = '';
+        });
+
+        loadUrlBtn.addEventListener('click', loadFromUrl);
+
+        clearVideoBtn.addEventListener('click', resetApp);
+
+        // مدیریت انتخاب فایل
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            if (!file.type.startsWith('video/')) {
+                alert('لطفاً یک فایل ویدیویی انتخاب کنید!');
+                return;
+            }
+            
+            loadVideo(URL.createObjectURL(file), file.name, formatFileSize(file.size));
+        }
+
+        // بارگذاری از URL
+        function loadFromUrl() {
+            const url = videoUrl.value.trim();
+            if (!url) {
+                alert('لطفاً لینک ویدیو را وارد کنید!');
+                return;
+            }
+            
+            if (!isValidUrl(url)) {
+                alert('لطفاً یک لینک معتبر وارد کنید!');
+                return;
+            }
+            
+            loadVideo(url, 'ویدیو از لینک مستقیم', 'لینک مستقیم');
+        }
+
+        // بارگذاری ویدیو
+        function loadVideo(url, name, details) {
+            videoPlayer.src = url;
+            previewPlayer.src = url;
+            
+            videoPlayer.style.display = 'block';
+            videoPlaceholder.style.display = 'none';
+            videoPreview.style.display = 'block';
+            videoInfo.style.display = 'block';
+            
+            fileName.textContent = name;
+            fileDetails.textContent = details;
+            
+            urlInputContainer.style.display = 'none';
+            urlUploadBox.style.display = 'block';
+            fileUploadBox.style.display = 'block';
+            videoUrl.value = '';
+            
+            togglePlayBtn.disabled = false;
+            
+            videoPlayer.onloadedmetadata = () => {
+                setupCanvas();
+                videoLoaded = true;
+                previewPlayer.play();
+                updateStatus();
+            };
+            
+            videoPlayer.onerror = () => {
+                alert('خطا در بارگذاری ویدیو!');
+                resetApp();
+            };
+        }
+
+        // کنترل پخش/توقف
+        togglePlayBtn.addEventListener('click', () => {
+            if (!videoLoaded) return;
+            
+            if (videoPlayer.paused) {
+                videoPlayer.play();
+                togglePlayBtn.innerHTML = '<i class="fas fa-pause"></i> توقف';
+                exitDrawingMode();
+            } else {
+                videoPlayer.pause();
+                togglePlayBtn.innerHTML = '<i class="fas fa-play"></i> پخش';
+                enterDrawingMode();
+            }
+            isVideoPaused = videoPlayer.paused;
+            updateStatus();
+        });
+
+        // ورود به حالت رسم
+        function enterDrawingMode() {
+            isDrawingMode = true;
+            drawingControls.style.display = 'flex';
+            videoModeBtn.classList.remove('active');
+            drawModeBtn.classList.add('active');
+            modeIndicator.textContent = 'رسم آزاد';
+            modeIndicator.className = 'mode-indicator mode-pen';
+            currentMode.textContent = 'رسم آزاد';
+            drawingCanvas.style.pointerEvents = 'auto';
+            drawingCanvas.style.cursor = 'crosshair';
+        }
+
+        // خروج از حالت رسم
+        function exitDrawingMode() {
+            isDrawingMode = false;
+            drawingControls.style.display = 'none';
+            drawModeBtn.classList.remove('active');
+            videoModeBtn.classList.add('active');
+            modeIndicator.textContent = 'ویدیو';
+            modeIndicator.className = 'mode-indicator mode-drawing';
+            currentMode.textContent = 'ویدیو';
+            drawingCanvas.style.pointerEvents = 'none';
+            drawingCanvas.style.cursor = 'default';
+        }
+
+        // تغییر حالت‌ها
+        videoModeBtn.addEventListener('click', () => {
+            videoPlayer.play();
+            togglePlayBtn.innerHTML = '<i class="fas fa-play"></i> پخش';
+            exitDrawingMode();
+        });
+
+        drawModeBtn.addEventListener('click', () => {
+            videoPlayer.pause();
+            togglePlayBtn.innerHTML = '<i class="fas fa-play"></i> پخش';
+            enterDrawingMode();
+        });
+
+        lineModeBtn.addEventListener('click', () => {
+            currentDrawingTool = 'line';
+            setActiveTool('lineTool');
+            currentTool.textContent = 'خط کش';
+        });
+
+        // انتخاب ابزار رسم
+        penTool.addEventListener('click', () => {
+            currentDrawingTool = 'pen';
+            setActiveTool('penTool');
+            currentTool.textContent = 'قلم';
+        });
+
+        lineTool.addEventListener('click', () => {
+            currentDrawingTool = 'line';
+            setActiveTool('lineTool');
+            currentTool.textContent = 'خط کش';
+        });
+
+        circleTool.addEventListener('click', () => {
+            currentDrawingTool = 'circle';
+            setActiveTool('circleTool');
+            currentTool.textContent = 'دایره';
+        });
+
+        textTool.addEventListener('click', () => {
+            currentDrawingTool = 'text';
+            setActiveTool('textTool');
+            currentTool.textContent = 'متن';
+        });
+
+        function setActiveTool(toolId) {
+            [penTool, lineTool, circleTool, textTool].forEach(tool => {
+                tool.classList.remove('active');
+            });
+            document.getElementById(toolId).classList.add('active');
+        }
+
+        // رویدادهای رسم
+        drawingCanvas.addEventListener('mousedown', startDrawing);
+        drawingCanvas.addEventListener('mousemove', draw);
+        drawingCanvas.addEventListener('mouseup', stopDrawing);
+        drawingCanvas.addEventListener('mouseleave', stopDrawing);
+        drawingCanvas.addEventListener('mouseenter', (e) => {
+            if (!isDrawingMode) return;
+            const rect = drawingCanvas.getBoundingClientRect();
+            const x = (e.clientX - rect.left) / zoomLevel;
+            const y = (e.clientY - rect.top) / zoomLevel;
+            cursorPosition.textContent = `${Math.round(x)}, ${Math.round(y)}`;
+        });
+
+        drawingCanvas.addEventListener('mousemove', (e) => {
+            if (!isDrawingMode) return;
+            const rect = drawingCanvas.getBoundingClientRect();
+            const x = (e.clientX - rect.left) / zoomLevel;
+            const y = (e.clientY - rect.top) / zoomLevel;
+            cursorPosition.textContent = `${Math.round(x)}, ${Math.round(y)}`;
+        });
+
+        function startDrawing(e) {
+            if (!isDrawingMode) return;
+            
+            isDrawing = true;
+            const rect = drawingCanvas.getBoundingClientRect();
+            lastX = (e.clientX - rect.left) / zoomLevel;
+            lastY = (e.clientY - rect.top) / zoomLevel;
+            
+            currentPath = [{x: lastX, y: lastY}];
+            
+            if (currentDrawingTool === 'text') {
+                const text = prompt('متن خود را وارد کنید:', 'آفساید');
+                if (text) {
+                    drawText(lastX, lastY, text);
+                    saveToHistory();
+                }
+                isDrawing = false;
+            }
+        }
+
+        function draw(e) {
+            if (!isDrawing || !isDrawingMode) return;
+            
+            const rect = drawingCanvas.getBoundingClientRect();
+            const currentX = (e.clientX - rect.left) / zoomLevel;
+            const currentY = (e.clientY - rect.top) / zoomLevel;
+            
+            currentPath.push({x: currentX, y: currentY});
+            
+            if (currentDrawingTool === 'pen') {
+                drawFreehand(currentX, currentY);
+            } else if (currentDrawingTool === 'line') {
+                // برای خط، کل فریم را دوباره بکش
+                redrawCanvasWithPath();
+                drawLinePreview(lastX, lastY, currentX, currentY);
+            } else if (currentDrawingTool === 'circle') {
+                redrawCanvasWithPath();
+                drawCirclePreview(lastX, lastY, currentX, currentY);
+            }
+        }
+
+        function stopDrawing() {
+            if (!isDrawing || !isDrawingMode) return;
+            
+            isDrawing = false;
+            
+            if (currentDrawingTool === 'line' && currentPath.length > 1) {
+                const endX = currentPath[currentPath.length - 1].x;
+                const endY = currentPath[currentPath.length - 1].y;
+                drawLine(lastX, lastY, endX, endY);
+            } else if (currentDrawingTool === 'circle' && currentPath.length > 1) {
+                const endX = currentPath[currentPath.length - 1].x;
+                const endY = currentPath[currentPath.length - 1].y;
+                drawCircle(lastX, lastY, endX, endY);
+            }
+            
+            saveToHistory();
+            currentPath = [];
+        }
+
+        // تابع‌های رسم
+        function drawFreehand(x, y) {
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(x, y);
+            ctx.strokeStyle = currentColor;
+            ctx.lineWidth = parseInt(brushSize.value);
+            ctx.stroke();
+            
+            lastX = x;
+            lastY = y;
+        }
+
+        function drawLine(x1, y1, x2, y2) {
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.strokeStyle = currentColor;
+            ctx.lineWidth = parseInt(brushSize.value);
+            ctx.stroke();
+        }
+
+        function drawLinePreview(x1, y1, x2, y2) {
+            const tempCtx = drawingCanvas.getContext('2d');
+            tempCtx.save();
+            tempCtx.beginPath();
+            tempCtx.moveTo(x1, y1);
+            tempCtx.lineTo(x2, y2);
+            tempCtx.strokeStyle = currentColor + '80'; // نیمه شفاف
+            tempCtx.lineWidth = parseInt(brushSize.value);
+            tempCtx.stroke();
+            tempCtx.restore();
+        }
+
+        function drawCircle(x1, y1, x2, y2) {
+            const radius = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+            ctx.beginPath();
+            ctx.arc(x1, y1, radius, 0, Math.PI * 2);
+            ctx.strokeStyle = currentColor;
+            ctx.lineWidth = parseInt(brushSize.value);
+            ctx.stroke();
+        }
+
+        function drawCirclePreview(x1, y1, x2, y2) {
+            const tempCtx = drawingCanvas.getContext('2d');
+            const radius = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+            tempCtx.save();
+            tempCtx.beginPath();
+            tempCtx.arc(x1, y1, radius, 0, Math.PI * 2);
+            tempCtx.strokeStyle = currentColor + '80';
+            tempCtx.lineWidth = parseInt(brushSize.value);
+            tempCtx.stroke();
+            tempCtx.restore();
+        }
+
+        function drawText(x, y, text) {
+            ctx.font = `${parseInt(brushSize.value) * 5}px Arial`;
+            ctx.fillStyle = currentColor;
+            ctx.fillText(text, x, y);
+        }
+
+        function redrawCanvasWithPath() {
+            // پاک کردن و دوباره کشیدن تاریخچه
+            if (drawingHistory.length > 0) {
+                ctx.putImageData(drawingHistory[drawingHistory.length - 1], 0, 0);
+            }
+        }
+
+        // کنترل‌های رسم
+        colorPicker.addEventListener('change', (e) => {
+            currentColor = e.target.value;
+        });
+
+        brushSize.addEventListener('input', (e) => {
+            brushSizeValue.textContent = `${e.target.value}px`;
+        });
+
+        undoBtn.addEventListener('click', undo);
+        
+        clearDrawBtn.addEventListener('click', () => {
+            if (confirm('آیا می‌خواهید همه رسم‌ها پاک شوند؟')) {
+                clearDrawingCanvas();
+            }
+        });
+
+        saveDrawBtn.addEventListener('click', saveDrawing);
+
+        // کنترل‌های ویدیو
+        speedSelect.addEventListener('change', () => {
+            videoPlayer.playbackRate = parseFloat(speedSelect.value);
+        });
+
+        zoomInBtn.addEventListener('click', () => {
+            zoomLevel = Math.min(3, zoomLevel + 0.25);
+            zoomValue.textContent = `${Math.round(zoomLevel * 100)}%`;
+            updateCanvasScale();
+        });
+
+        zoomOutBtn.addEventListener('click', () => {
+            zoomLevel = Math.max(1, zoomLevel - 0.25);
+            zoomValue.textContent = `${Math.round(zoomLevel * 100)}%`;
+            updateCanvasScale();
+        });
+
+        function updateCanvasScale() {
+            drawingCanvas.style.transform = `scale(${zoomLevel})`;
+            drawingCanvas.style.transformOrigin = '0 0';
+        }
+
+        gridToggleBtn.addEventListener('click', () => {
+            isGridVisible = !isGridVisible;
+            gridToggleBtn.classList.toggle('active');
+            if (isGridVisible) {
+                drawGrid();
+            } else {
+                redrawCanvasWithPath();
+            }
+        });
+
+        function drawGrid() {
+            if (!isGridVisible) return;
+            
+            ctx.save();
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+            ctx.lineWidth = 1;
+            
+            const gridSize = 50;
+            
+            // خطوط عمودی
+            for (let x = 0; x < drawingCanvas.width; x += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, drawingCanvas.height);
+                ctx.stroke();
+            }
+            
+            // خطوط افقی
+            for (let y = 0; y < drawingCanvas.height; y += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(drawingCanvas.width, y);
+                ctx.stroke();
+            }
+            
+            ctx.restore();
+        }
+
+        screenshotBtn.addEventListener('click', takeScreenshot);
+
+        exportBtn.addEventListener('click', exportResult);
+
+        function takeScreenshot() {
+            if (!videoLoaded) return;
+            
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = videoPlayer.videoWidth || drawingCanvas.width;
+            tempCanvas.height = videoPlayer.videoHeight || drawingCanvas.height;
+            const tempCtx = tempCanvas.getContext('2d');
+            
+            // رسم ویدیو
+            tempCtx.drawImage(videoPlayer, 0, 0, tempCanvas.width, tempCanvas.height);
+            
+            // رسم کانواس روی آن
+            tempCtx.drawImage(drawingCanvas, 0, 0, tempCanvas.width, tempCanvas.height);
+            
+            // ذخیره
+            const link = document.createElement('a');
+            link.download = `var-drawing-${new Date().getTime()}.png`;
+            link.href = tempCanvas.toDataURL('image/png');
+            link.click();
+            
+            alert('عکس با موفقیت ذخیره شد!');
+        }
+
+        function saveDrawing() {
+            const link = document.createElement('a');
+            link.download = `drawing-${new Date().getTime()}.png`;
+            link.href = drawingCanvas.toDataURL('image/png');
+            link.click();
+            alert('رسم با موفقیت ذخیره شد!');
+        }
+
+        function exportResult() {
+            if (!videoLoaded) return;
+            
+            // ترکیب ویدیو و رسم
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = drawingCanvas.width;
+            tempCanvas.height = drawingCanvas.height;
+            const tempCtx = tempCanvas.getContext('2d');
+            
+            // کپی فریم ویدیو
+            tempCtx.drawImage(videoPlayer, 0, 0, tempCanvas.width, tempCanvas.height);
+            
+            // اضافه کردن رسم
+            tempCtx.drawImage(drawingCanvas, 0, 0);
+            
+            // اضافه کردن واترمارک
+            tempCtx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+            tempCtx.fillRect(0, tempCanvas.height - 40, tempCanvas.width, 40);
+            tempCtx.fillStyle = '#fff';
+            tempCtx.font = '14px Arial';
+            tempCtx.textAlign = 'right';
+            tempCtx.fillText('سیستم VAR - رسم آفساید', tempCanvas.width - 20, tempCanvas.height - 20);
+            
+            const link = document.createElement('a');
+            link.download = `var-analysis-${new Date().getTime()}.png`;
+            link.href = tempCanvas.toDataURL('image/png');
+            link.click();
+            
+            alert('نتایج با موفقیت ذخیره شد!');
+        }
+
+        // به‌روزرسانی وضعیت
+        function updateStatus() {
+            currentTool.textContent = getToolName(currentDrawingTool);
+            brushSizeValue.textContent = `${brushSize.value}px`;
+        }
+
+        function getToolName(tool) {
+            const tools = {
+                'pen': 'قلم',
+                'line': 'خط کش',
+                'circle': 'دایره',
+                'text': 'متن'
+            };
+            return tools[tool] || '--';
+        }
+
+        // اعتبارسنجی URL
+        function isValidUrl(string) {
+            try {
+                new URL(string);
+                return true;
+            } catch (_) {
+                return false;
+            }
+        }
+
+        // قالب‌بندی حجم فایل
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 بایت';
+            const k = 1024;
+            const sizes = ['بایت', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // بازنشانی برنامه
+        resetBtn.addEventListener('click', resetApp);
+
+        function resetApp() {
+            videoPlayer.pause();
+            videoPlayer.src = '';
+            videoPlayer.style.display = 'none';
+            videoPlaceholder.style.display = 'flex';
+            videoPreview.style.display = 'none';
+            videoInfo.style.display = 'none';
+            previewPlayer.src = '';
+            
+            togglePlayBtn.disabled = true;
+            togglePlayBtn.innerHTML = '<i class="fas fa-play"></i> پخش/توقف';
+            drawingHistory = [];
+            currentPath = [];
+            zoomLevel = 1;
+            zoomValue.textContent = '100%';
+            speedSelect.value = '1';
+            isGridVisible = false;
+            gridToggleBtn.classList.remove('active');
+            videoLoaded = false;
+            isDrawingMode = false;
+            drawingControls.style.display = 'none';
+            
+            urlInputContainer.style.display = 'none';
+            urlUploadBox.style.display = 'block';
+            fileUploadBox.style.display = 'block';
+            videoUrl.value = '';
+            fileInput.value = '';
+            
+            clearDrawingCanvas();
+            updateStatus();
+            currentMode.textContent = 'ویدیو';
+            cursorPosition.textContent = '--';
+            
+            videoModeBtn.classList.add('active');
+            drawModeBtn.classList.remove('active');
+            setActiveTool('penTool');
+        }
+
+        // راهنمایی اولیه
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                helpModal.style.display = 'flex';
+            }, 1000);
+        });
+
+        closeHelpBtn.addEventListener('click', () => {
+            helpModal.style.display = 'none';
+        });
+
+        // تنظیم مجدد کانواس هنگام تغییر اندازه
+        window.addEventListener('resize', () => {
+            if (videoLoaded) {
+                setupCanvas();
+                // دوباره کشیدن تاریخچه
+                if (drawingHistory.length > 0) {
+                    ctx.putImageData(drawingHistory[drawingHistory.length - 1], 0, 0);
+                }
+            }
+        });
+
+        // کنترل با کیبورد
+        document.addEventListener('keydown', (e) => {
+            if (!videoLoaded) return;
+            
+            // Space برای پخش/توقف
+            if (e.code === 'Space') {
+                e.preventDefault();
+                togglePlayBtn.click();
+            }
+            
+            // Ctrl+Z برای بازگشت
+            if (e.ctrlKey && e.code === 'KeyZ') {
+                e.preventDefault();
+                undo();
+            }
+            
+            // Ctrl+S برای ذخیره
+            if (e.ctrlKey && e.code === 'KeyS') {
+                e.preventDefault();
+                saveDrawing();
+            }
+            
+            // Escape برای خروج از حالت رسم
+            if (e.code === 'Escape') {
+                exitDrawingMode();
+            }
+        });
+
+        // پیش‌نمایش لینک‌های آپارات
+        videoUrl.addEventListener('input', () => {
+            if (videoUrl.value.includes('aparat.com')) {
+                videoUrl.style.borderColor = '#28a745';
+            }
+        });
+    </script>
+</body>
+</html>
